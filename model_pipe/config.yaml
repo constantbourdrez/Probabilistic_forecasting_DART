@@ -1,0 +1,41 @@
+data_path: '../data/weighted_temps.shp'
+checkpoint_path: 'path_to_checkpoint.ckpt'
+hparams_path: 'path_to_hparams.yaml'
+device: 'mps'  # or 'cuda', 'cpu', etc.
+
+preprocessor:
+  batch_size: 50
+  feature_names: ['ssrd','sum_precip', 'mxrh24', 'SPI_correc', 'mn2t24', 'ws', 'degree_day']
+  ratio: 0.8
+  shuffle: True
+
+
+model:
+  N: 100
+  sample_steps: 2
+  sample_strategy: 'ddim_multi'
+  beta_start: 0.0001
+  beta_end: 0.02
+  in_channels: 8 #5
+  n_blocks: 5 #5 after
+  n_resolutions: 2
+  t_emb_dim: 40
+  num_vertices: 24
+  historic_length: 40
+  horizon_pred: 30
+  proj_dim: 16
+  channel_multipliers: [1, 2]
+  beta_schedule: 'uniform'
+  dropout: 0.15
+  mask_ratio : 0.15
+  num_samples : 2
+
+early_stopping:
+  monitor: 'val_loss'
+  patience: 3
+  verbose: True
+  mode: 'min'
+
+trainer:
+  max_epochs: 100
+  log_every_n_steps: 10
