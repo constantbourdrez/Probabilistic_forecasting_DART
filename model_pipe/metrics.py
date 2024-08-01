@@ -38,3 +38,11 @@ def calc_mae(target, forecast, eval_points):
     eval_points: (B, T, V): which values should be evaluated,
     """
     return (th.sum(th.abs(target - forecast.mean(dim = 1)) * eval_points) / eval_points.sum()).item()
+
+def calc_relative_error(target, forecast, eval_points):
+    """
+    target: (B, T, V), torch.Tensor
+    forecast: (B, n_sample, T, V), torch.Tensor
+    eval_points: (B, T, V): which values should be evaluated,
+    """
+    return (th.sum((th.abs(target - forecast.mean(dim = 1)) * eval_points) / target) / eval_points.sum()).item()
