@@ -36,7 +36,7 @@ class NoiseScheduler:
         Sample from  q(x_t|x_0) ~ N(x_t; \sqrt\bar\alpha_t * x_0, (1 - \bar\alpha_t)I)
         """
         tensor_shape = original.shape
-        feature_size = tensor_shape[1]
+        feature_size = tensor_shape[2]
         batch_size = tensor_shape[0]
         self.device = original.device
 
@@ -50,8 +50,8 @@ class NoiseScheduler:
 
         sqrt_alpha_cumprod = sqrt_alpha_cumprod.repeat(1, original.size(1), original.size(2), original.size(3))
         sqrt_one_minus_alpha_cumprod = sqrt_one_minus_alpha_cumprod.repeat(1, original.size(1), original.size(2), original.size(3))
-        sqrt_alpha_cumprod[:,:feature_size - 1, :, : ] = 1
-        sqrt_one_minus_alpha_cumprod[:,:feature_size - 1, :, : ] = 0
+        sqrt_alpha_cumprod[:,:, :feature_size - 1, : ] = 1
+        sqrt_one_minus_alpha_cumprod[:,:, :feature_size - 1, : ] = 0
 
         return sqrt_alpha_cumprod * original + sqrt_one_minus_alpha_cumprod * noise
 
@@ -192,7 +192,7 @@ class DART_STG(nn.Module):
             raise NotImplementedError
 
         x = th.randn([B, self.eps_model.F, V, T], device=self.device) #generate input noise
-        xs, x0_preds = self.generalized_steps(x, seq, self.eps_model,  c, edge_index, edge_weights, eta=1)
+        xs, x0_preds = self.generalized_steps(x, seq, self.eps_model,  c, edge_index, edge_weights, eta=1 + 2e-3)
         return xs, x0_preds
 
     def set_sample_strategy(self, sample_strategy):
